@@ -1,0 +1,28 @@
+From 8764027cbba74762fd86b2c6a370abe7f580129a Mon Sep 17 00:00:00 2001
+From: John MacFarlane <jgm@berkeley.edu>
+Date: Wed, 28 Jun 2023 18:35:40 -0700
+Subject: [PATCH] Markdown reader: add strictness annotations.
+
+This fixes the memory leak noted in #8762.
+Closes #8762.
+---
+ src/Text/Pandoc/Readers/Markdown.hs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Text/Pandoc/Readers/Markdown.hs b/src/Text/Pandoc/Readers/Markdown.hs
+index 6038ecab19d0..0d124ae23fbd 100644
+--- a/src/Text/Pandoc/Readers/Markdown.hs
++++ b/src/Text/Pandoc/Readers/Markdown.hs
+@@ -1908,10 +1908,10 @@ regLink :: PandocMonad m
+         -> F Inlines
+         -> MarkdownParser m (F Inlines)
+ regLink constructor lab = try $ do
+-  (src, tit) <- source
++  (!src, !tit) <- source
+   rebase <- option False (True <$ guardEnabled Ext_rebase_relative_paths)
+   pos <- getPosition
+-  let src' = if rebase then rebasePath pos src else src
++  let !src' = if rebase then rebasePath pos src else src
+   attr <- option nullAttr $
+           guardEnabled Ext_link_attributes >> attributes
+   return $ constructor attr src' tit <$> lab
